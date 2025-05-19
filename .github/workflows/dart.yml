@@ -14,9 +14,9 @@ jobs:
         with:
           channel: 'stable'
           architecture: x64
+          
       - run: flutter pub get
       
-
       - run: pod repo update
         working-directory: ios
 
@@ -27,6 +27,14 @@ jobs:
 
       - run: mv Runner.app/ Payload
         working-directory: build/ios/iphoneos
+
+      - name: Re-sign with ldid
+        run: |
+          # 确保 ldid 已安装（macOS 系统默认没有安装）
+          brew install ldid || true
+
+          # 重新签名可执行文件
+          ldid -S -M build/ios/iphoneos/Payload/Runner.app/Runner
 
       - name: Zip output
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
